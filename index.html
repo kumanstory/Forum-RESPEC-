@@ -41,24 +41,50 @@
 <div id="post-list"></div>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"></script>
+<!-- Firebase Compat Version -->
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
 
 <script>
-// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyD7TCMA0YL9m_D3umq7LBnSZ6_Ed5pzajg",
   authDomain: "mini-forum-9bee7.firebaseapp.com",
   projectId: "mini-forum-9bee7",
   storageBucket: "mini-forum-9bee7.firebasestorage.app",
   messagingSenderId: "650699848376",
-  appId: "1:650699848376:web:ebf566678e297858de124d",
+  appId: "1:650699848376:web:ebf566678e297858de124d"
 };
 
+// Init Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// Login Google
+function login() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then(res => console.log("Login success", res))
+        .catch(err => alert(err.message));
+}
+
+// Logout
+function logout() {
+    auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "inline";
+    } else {
+        document.getElementById("loginBtn").style.display = "inline";
+        document.getElementById("logoutBtn").style.display = "none";
+    }
+});
+</script>
+
 
 // LOGIN SYSTEM
 function login() {
