@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forum Mini Modern</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <img src="logo.png" alt="Logo" class="logo">
+  <h1>Forum Mini</h1>
+</header>
+
+<main>
+  <section id="postForm" class="card">
+    <textarea id="postText" placeholder="Tulis sesuatu..." rows="3"></textarea>
+    <button onclick="submitPost()">Kirim Postingan</button>
+  </section>
+
+  <section id="postList"></section>
+</main>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ======= FIREBASE CONFIG =======
+const firebaseConfig = {
+  apiKey: "ISI-PUNYAMU",
+  authDomain: "ISI-PUNYAMU",
+  databaseURL: "ISI-PUNYAMU",
+  projectId: "ISI-PUNYAMU",
+  storageBucket: "ISI-PUNYAMU",
+  messagingSenderId: "ISI-PUNYAMU",
+  appId: "ISI-PUNYAMU"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+// ======= LOGIN ANONIM =======
+signInAnonymously(auth);
+
+// ======= SUBMIT POSTINGAN =======
+window.submitPost = function() {
+  const text = document.getElementById("postText").value.trim();
+  if(!text) return;
+
+  const postRef = push(ref(db, "posts"));
+  set(postRef, {
+    text,
+    uid: auth.currentUser.uid,
+    username: "Anon",
+    time: new Date().toLocaleString()
+  });
+
+  document.getElementById("postText").value = "";
+};
+
+// ======= TAMPILKAN POSTINGAN + KOMENTAR =======
+const postList = document.getElementById("postList");
+
+onValue(ref(db, "posts"), snapshot => {
+  postList.innerHTML = "";
+  snapshot.forEach(child => {
+    const post = child.val();
+    const postId = child.key;
+
+    postList.innerHTML += `
+      <div class="card post">
+        <p class="username">${post.username}</p>
+        <p class="text">${post.text}</p>
+        <small class="time">${post.time}</small><br>
+        ${auth.currentUser.uid === post.uid ? `<button class="edit-btn" onclick="editPost('${postId}','${post.text}')">Edit Post</button>` : ''}
+
+        <textarea id="comment-${postId}" placeholder="Tulis komentar..." rows="2"></textarea>
+        <button class="comment-btn" onclick="addComment('${postId}')">Kirim Komentar</button>
+        <div id="commentList-${postId}" class="comments"></div>
+      </div>
+    `;
+
+    loadComments(postId);
+  });
+});
+
+// ======= EDIT POST =======
+window.editPost = function(postId, oldText) {
+  const newText = prompt("Edit postingan:", oldText);
+  if(newText && newText.trim()!==""){
+    update(ref(db,"posts/"+postId), { text:newText });
+  }
+};
+
+// ======= ADD COMMENT =======
+window.addComment = function(postId){
+  const input = document.getElementById("comment-"+postId);
+  const text = input.value.trim();
+  if(!text) return;
+
+  const commentRef = push(ref(db,"comments/"+postId));
+  set(commentRef, {
+    text,
+    uid: auth.currentUser.uid,
+    username: "Anon",
+    time: new Date().toLocaleString()
+  });
+
+  input.value = "";
+};
+
+// ======= LOAD KOMENTAR =======
+function loadComments(postId){
+  const commentBox = document.getElementById("commentList-"+postId);
+  onValue(ref(db,"comments/"+postId), snapshot=>{
+    commentBox.innerHTML = "";
+    snapshot.forEach(child=>{
+      const c = child.val();
+      const commentId = child.key;
+
+      commentBox.innerHTML += `
+        <div class="comment">
+          <p class="username">${c.username}</p>
+          <p class="text">${c.text}</p>
+          <small class="time">${c.time}</small><br>
+          ${auth.currentUser.uid === c.uid ? `<button class="edit-btn" onclick="editComment('${postId}','${commentId}','${c.text}')">Edit Komentar</button>` : ''}
+        </div>
+      `;
+    });
+  });
+}
+
+// ======= EDIT KOMENTAR =======
+window.editComment = function(postId, commentId, oldText){
+  const newText = prompt("Edit komentar:", oldText);
+  if(newText && newText.trim()!==""){
+    update(ref(db,`comments/${postId}/${commentId}`), { text:newText });
+  }
+};
+
+</script>
+</body>
+</html>
