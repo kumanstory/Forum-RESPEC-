@@ -1,0 +1,83 @@
+body {
+  font-family: Arial, sans-serif;
+  margin:0;
+  padding:0;
+  background:#f0f2f5;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* bisa ganti flex-start jika ingin di kiri */
+  background:#007bff;
+  color:#fff;
+  padding:15px;
+}
+
+header img.logo {
+  height: 40px;       /* tinggi logo */
+  margin-right: 10px; /* jarak antara logo dan teks */
+}
+
+
+h1 { margin:0; }
+
+main { padding:15px; }
+
+.card {
+  background:#fff;
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom:15px;
+}
+
+textarea {
+  width:100%;
+  padding:10px;
+  border-radius:5px;
+  border:1px solid #ccc;
+  margin-top:5px;
+}
+
+button {
+  padding:7px 12px;
+  border:none;
+  border-radius:5px;
+  background:#007bff;
+  color:#fff;
+  cursor:pointer;
+  margin-top:5px;
+}
+
+button:hover {
+  background:#0056b3;
+}
+
+.post .username, .comment .username {
+  font-weight:bold;
+  color:#333;
+}
+
+.post .text, .comment .text {
+  margin:5px 0;
+}
+
+.post .time, .comment .time {
+  color:#666;
+  font-size:12px;
+}
+
+.comments {
+  margin-top:10px;
+  padding-left:10px;
+  border-left:2px solid #ddd;
+}
+
+.edit-btn, .comment-btn {
+  background:#28a745;
+}
+
+.edit-btn:hover, .comment-btn:hover {
+  background:#218838;
+}
