@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Buat Post</title>
+<style>
+    body { font-family: Arial; padding: 20px; }
+    textarea, input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+    }
+    button {
+        padding: 10px 15px;
+        border: none;
+        background: black;
+        color: white;
+        border-radius: 5px;
+        margin-top: 15px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h2>Buat Postingan Baru</h2>
+
+<input id="title" placeholder="Judul...">
+<textarea id="content" placeholder="Isi postingan..."></textarea>
+
+<button onclick="savePost()">Publikasikan</button>
+
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js"></script>
+
+<script>
+// CONFIG FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyD7TCMA0YL9m_D3umq7LBnSZ6_Ed5pzajg",
+  authDomain: "mini-forum-9bee7.firebaseapp.com",
+  projectId: "mini-forum-9bee7",
+  storageBucket: "mini-forum-9bee7.firebasestorage.app",
+  messagingSenderId: "650699848376",
+  appId: "1:650699848376:web:ebf566678e297858de124d",
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// SIMPAN POST
+function savePost() {
+    let user = auth.currentUser;
+
+    if (!user) return alert("Login dulu!");
+
+    let title = document.getElementById("title").value;
+    let content = document.getElementById("content").value;
+
+    if (title.trim() === "" || content.trim() === "") {
+        return alert("Judul dan isi harus diisi!");
+    }
+
+    db.collection("posts").add({
+        title,
+        content,
+        user: user.displayName,
+        uid: user.uid,
+        time: Date.now()
+    }).then(() => {
+        alert("Postingan berhasil dibuat!");
+        window.location.href = "home.html";
+    });
+}
+</script>
+
+</body>
+</html>
