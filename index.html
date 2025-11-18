@@ -64,24 +64,31 @@ window.submitPost = function() {
 // ======= TAMPILKAN POSTINGAN + KOMENTAR =======
 const postList = document.getElementById("postList");
 
-onValue(ref(db, "posts"), snapshot => {
-  postList.innerHTML = "";
-  snapshot.forEach(child => {
-    const post = child.val();
-    const postId = child.key;
+function loadPosts() {
+  onValue(ref(db, "posts"), snapshot => {
+    postList.innerHTML = "";
+    snapshot.forEach(child => {
+      const post = child.val();
+      const postId = child.key;
 
-    postList.innerHTML += `
-      <div class="card post">
-        <p class="username">${post.username}</p>
-        <p class="text">${post.text}</p>
-        <small class="time">${post.time}</small><br>
-        ${auth.currentUser.uid === post.uid ? `<button class="edit-btn" onclick="editPost('${postId}','${post.text}')">Edit Post</button>` : ''}
+      postList.innerHTML += `
+        <div class="card post">
+          <p class="username">${post.username}</p>
+          <p class="text">${post.text}</p>
+          <small class="time">${post.time}</small><br>
+          ${auth.currentUser.uid === post.uid<button class="edit-btn" onclick="editPost('${postId}', \`${post.text.replace(/`/g,'\\`')}\`)">Edit Post</button>
+="editPost('${postId}','${post.text}')">Edit Post</button>` : ''}
 
-        <textarea id="comment-${postId}" placeholder="Tulis komentar..." rows="2"></textarea>
-        <button class="comment-btn" onclick="addComment('${postId}')">Kirim Komentar</button>
-        <div id="commentList-${postId}" class="comments"></div>
-      </div>
-    `;
+          <textarea id="comment-${postId}" placeholder="Tulis komentar..." rows="2"></textarea>
+          <button class="comment-btn" onclick="addComment('${postId}')">Kirim Komentar</button>
+          <div id="commentList-${postId}" class="comments"></div>
+        </div>
+      `;
+
+      loadComments(postId);
+    });
+  });
+}
 
     loadComments(postId);
   });
